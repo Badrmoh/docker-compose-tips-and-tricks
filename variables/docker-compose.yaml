@@ -12,8 +12,8 @@ x-shared-networks: &networks
 
 x-shared-environments: &envs
     environment:    
-        VAR1: "${VAR1:-value1}"
-        VAR2: "${VAR2:-value2}"
+        VAR1: "${variable1:-value1}"
+        VAR2: "${variable2:-value2}"
 
 x-shared-var-files: &env-files
     env_file: 
@@ -29,7 +29,7 @@ services:
     <<: *envs
     <<: *client-defaults
     <<: *defaults
-    <<: *env-files
+    <<: *env-files 
 
   host1:
     image: "ssh-server"
@@ -62,7 +62,3 @@ services:
 networks:
   ssh-net:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 10.0.1.0/24
-
