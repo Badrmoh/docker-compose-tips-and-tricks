@@ -1,0 +1,60 @@
+---
+x-defaults: &defaults
+    tty: true
+    stdin_open: true
+
+x-client-defaults: &client-defaults
+    user: "user"
+
+x-client-image: &client-image
+    image: "ssh-client"
+    build: 
+        context: ../docker-hosts
+        dockerfile: ../docker-hosts/client.Dockerfile
+
+x-server-image: &server-image
+    image: "ssh-server"
+    build: 
+        context: ../docker-hosts
+        dockerfile: ../docker-hosts/server.Dockerfile
+
+x-shared-networks: &networks
+    networks:
+        ssh-net:
+
+x-shared-environments: &envs
+    environment:    
+        VAR1: "value1"
+        VAR2: "value2"
+
+services:
+  client:
+    <<: *client-image
+    <<: *networks
+    <<: *envs
+    <<: *client-defaults
+    <<: *defaults
+
+  host1:
+    <<: *server-image
+    <<: *networks
+    <<: *envs
+    <<: *defaults
+  host2:
+    <<: *server-image
+    <<: *networks
+    <<: *envs
+    <<: *defaults
+  host3:
+    <<: *server-image
+    <<: *networks
+    <<: *envs
+    <<: *defaults
+
+networks:
+  ssh-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
+

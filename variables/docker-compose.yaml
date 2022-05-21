@@ -1,0 +1,68 @@
+---
+x-defaults: &defaults
+    tty: true
+    stdin_open: true
+
+x-client-defaults: &client-defaults
+    user: "user"
+
+x-shared-networks: &networks
+    networks:
+        ssh-net:
+
+x-shared-environments: &envs
+    environment:    
+        VAR1: "${VAR1:-value1}"
+        VAR2: "${VAR2:-value2}"
+
+x-shared-var-files: &env-files
+    env_file: 
+        - defaults.env
+
+services:
+  client:
+    image: "ssh-client"
+    build: 
+        context: ${BUILD_CONTEXT}
+        dockerfile: ${BUILD_CONTEXT}/client.Dockerfile
+    <<: *networks
+    <<: *envs
+    <<: *client-defaults
+    <<: *defaults
+    <<: *env-files
+
+  host1:
+    image: "ssh-server"
+    build: 
+        context: ${BUILD_CONTEXT}
+        dockerfile: ${BUILD_CONTEXT}/server.Dockerfile
+    <<: *networks
+    <<: *envs
+    <<: *defaults
+    <<: *env-files
+  host2:
+    image: "ssh-server"
+    build: 
+        context: ${BUILD_CONTEXT}
+        dockerfile: ${BUILD_CONTEXT}/server.Dockerfile
+    <<: *networks
+    <<: *envs
+    <<: *defaults
+    <<: *env-files
+  host3:
+    image: "ssh-server"
+    build: 
+        context: ${BUILD_CONTEXT}
+        dockerfile: ${BUILD_CONTEXT}/server.Dockerfile
+    <<: *networks
+    <<: *envs
+    <<: *defaults
+    <<: *env-files
+
+networks:
+  ssh-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
+

@@ -1,0 +1,77 @@
+---
+x-defaults: &defaults
+    tty: true
+    stdin_open: true
+
+x-client-defaults: &client-defaults
+    user: "user"
+
+x-client-image: &client-image
+    image: "ssh-client"
+    build: 
+        context: ../docker-hosts
+        dockerfile: ../docker-hosts/client.Dockerfile
+
+x-server-image: &server-image
+    image: "ssh-server"
+    build: 
+        context: ../docker-hosts
+        dockerfile: ../docker-hosts/server.Dockerfile
+
+x-shared-networks: &networks
+    networks:
+        ssh-net:
+
+x-shared-environments: &envs
+    environment:    
+        VAR1: "value1"
+        VAR2: "value2"
+
+x-pg-health-check: &pg-health-check
+    healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+
+x-depends-on-healthy: &depends-on-healthy
+    condition: service_healthy
+
+services:
+  client:
+    <<: *client-image
+    <<: *networks
+    <<: *envs
+    <<: *client-defaults
+    <<: *defaults
+    depends_on:
+        db:
+            <<: *depends-on-healthy
+
+  host1:
+    <<: *server-image
+    <<: *networks
+    <<: *envs
+    <<: *defaults
+  host2:
+    <<: *server-image
+    <<: *networks
+    <<: *envs
+    <<: *defaults
+  host3:
+    <<: *server-image
+    <<: *networks
+    <<: *envs
+    <<: *defaults
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    <<: *pg-health-check 
+
+networks:
+  ssh-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
+
