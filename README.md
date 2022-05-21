@@ -23,6 +23,7 @@ docker-compose -f variables/docker-compose.yaml up -d
 ```
 
 #### Depends
+```
 docker-compose -f depends/docker-compose.yaml up -d
 ```
 Then, in a different terminal windows:
